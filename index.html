@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>互動程式設計_12345</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+
+    .light-mode {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .dark-mode {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .header-btn {
+      position: absolute;
+      left: 0;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .light-mode .header-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .dark-mode .header-btn {
+      background-color: #45a049;
+      color: white;
+    }
+
+    .header-btn:hover {
+      opacity: 0.8;
+    }
+
+    .tool-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tool-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      flex: 1 1 calc(50% - 10px);
+      min-width: 120px;
+      transition: all 0.3s;
+    }
+
+    .light-mode .tool-btn {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .dark-mode .tool-btn {
+      background-color: #1976D2;
+      color: white;
+    }
+
+    .tool-btn:hover {
+      opacity: 0.85;
+      transform: scale(1.02);
+    }
+
+    .tool-btn.active {
+      background-color: #FF9800;
+    }
+
+    .time-display {
+      text-align: center;
+      padding: 30px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    .light-mode .time-display {
+      background-color: #f5f5f5;
+    }
+
+    .dark-mode .time-display {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+    }
+
+    .input-section {
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .light-mode .input-section {
+      background-color: #f9f9f9;
+    }
+
+    .dark-mode .input-section {
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+    }
+
+    .input-section h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .light-mode .input-group input {
+      background-color: white;
+      color: black;
+    }
+
+    .dark-mode .input-group input {
+      background-color: #333;
+      color: white;
+      border-color: #555;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .light-mode .submit-btn {
+      background-color: #9C27B0;
+      color: white;
+    }
+
+    .dark-mode .submit-btn {
+      background-color: #7B1FA2;
+      color: white;
+    }
+
+    .submit-btn:hover {
+      opacity: 0.85;
+    }
+
+    .info-display {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    .light-mode .info-display {
+      background-color: #e8f5e9;
+    }
+
+    .dark-mode .info-display {
+      background-color: #1a2f1a;
+      border: 1px solid #2e7d32;
+    }
+
+    .info-display h3 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid;
+    }
+
+    .light-mode .info-item {
+      border-color: #ccc;
+    }
+
+    .dark-mode .info-item {
+      border-color: #444;
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: bold;
+    }
+
+    .zhuyin-text {
+      font-size: 0.7em;
+      vertical-align: super;
+      color: #E91E63;
+      margin-left: 2px;
+    }
+
+    .zhuyin-display {
+      font-size: 0.5em;
+      color: #E91E63;
+      display: block;
+      margin-top: 5px;
+    }
+
+    @media (min-width: 768px) {
+      .header-title {
+        font-size: 2rem;
+      }
+
+      .tool-btn {
+        flex: 0 0 auto;
+        padding: 15px 30px;
+      }
+
+      .time-display {
+        font-size: 3.5rem;
+      }
+
+      .container {
+        padding: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" :class="['container', isDarkMode ? 'dark-mode' : 'light-mode']">
+    <!-- 標題區 -->
+    <div class="header">
+      <a href="https://www.tku.edu.tw/" target="_blank" class="header-btn">
+        {{ showZhuyin ? '連線到淡江教科系' : '連線到淡江教科系' }}
+      </a>
+      <h1 class="header-title">
+        <span v-if="showZhuyin">
+          互<span class="zhuyin-text">ㄏ</span>動<span class="zhuyin-text">ㄉ</span>程<span class="zhuyin-text">ㄔ</span>式<span class="zhuyin-text">ㄕ</span>設<span class="zhuyin-text">ㄕ</span>計<span class="zhuyin-text">ㄐ</span>_12345
+        </span>
+        <span v-else>互動程式設計_12345</span>
+      </h1>
+    </div>
+
+    <!-- 三個功能按鈕 -->
+    <div class="tool-buttons">
+      <button 
+        class="tool-btn" 
+        :class="{ active: showCountdown }"
+        @click="toggleCountdown"
+      >
+        <span v-if="showCountdown">
+          切換到現在時間<span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄑ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄗ</span><span class="zhuyin-text">ㄞ</span><span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span>
+        </span>
+        <span v-else>
+          切換到倒數計時<span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄑ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄉ</span><span class="zhuyin-text">ㄙ</span><span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span>
+        </span>
+      </button>
+      <button 
+        class="tool-btn" 
+        :class="{ active: showZhuyin }"
+        @click="toggleZhuyin"
+      >
+        {{ showZhuyin ? '關閉注音符號' : '開啟注音符號' }}
+      </button>
+      <button 
+        class="tool-btn" 
+        :class="{ active: isDarkMode }"
+        @click="toggleTheme"
+      >
+        <span v-if="isDarkMode">
+          切換白底黑字<span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄑ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄅ</span><span class="zhuyin-text">ㄟ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄟ</span><span class="zhuyin-text">ㄗ</span>
+        </span>
+        <span v-else>
+          切換黑底白字<span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄑ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄏ</span><span class="zhuyin-text">ㄟ</span><span class="zhuyin-text">ㄅ</span><span class="zhuyin-text">ㄟ</span><span class="zhuyin-text">ㄗ</span>
+        </span>
+      </button>
+    </div>
+
+    <!-- 時間顯示區 -->
+    <div class="time-display">
+      <template v-if="showCountdown">
+        <div v-if="countdownTime > 0">
+          {{ formatCountdown(countdownTime) }}
+        </div>
+        <div v-else>
+          <span v-if="showZhuyin">時間<span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span>到！</span>
+          <span v-else>時間到！</span>
+        </div>
+      </template>
+      <template v-else>
+        {{ currentTime }}
+      </template>
+    </div>
+
+    <!-- 資料輸入區 -->
+    <div class="input-section">
+      <h3>
+        <span v-if="showZhuyin">監<span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span>考<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄕ</span>試<span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄕ</span>資<span class="zhuyin-text">ㄗ</span><span class="zhuyin-text">ㄌ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄠ</span>料<span class="zhuyin-text">ㄌ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄠ</span>輸<span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄩ</span><span class="zhuyin-text">ㄖ</span>入<span class="zhuyin-text">ㄖ</span></span>
+        <span v-else>監考資料輸入</span>
+      </h3>
+      
+      <div class="input-group">
+        <label>
+          <span v-if="showZhuyin">考<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄕ</span>試<span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄕ</span>時<span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span></span>
+          <span v-else>考試時間</span>
+        </label>
+        <input 
+          type="text" 
+          v-model="examTime" 
+          :placeholder="showZhuyin ? '例如：90分鐘' : '例如：90分鐘'"
+        >
+      </div>
+
+      <div class="input-group">
+        <label>
+          <span v-if="showZhuyin">考<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄕ</span>試<span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄕ</span>科<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄇ</span><span class="zhuyin-text">ㄨ</span></span>
+          <span v-else>考試科目</span>
+        </label>
+        <input 
+          type="text" 
+          v-model="subject" 
+          :placeholder="showZhuyin ? '例如：數學' : '例如：數學'"
+        >
+      </div>
+
+      <div class="input-group">
+        <label>
+          <span v-if="showZhuyin">監<span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span>考<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄕ</span>老<span class="zhuyin-text">ㄌ</span><span class="zhuyin-text">ㄠ</span><span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄕ</span></span>
+          <span v-else>監考老師</span>
+        </label>
+        <input 
+          type="text" 
+          v-model="teacher" 
+          :placeholder="showZhuyin ? '例如：王老師' : '例如：王老師'"
+        >
+      </div>
+
+      <button class="submit-btn" @click="submitInfo">
+        <span v-if="showZhuyin">確<span class="zhuyin-text">ㄑ</span><span class="zhuyin-text">ㄩ</span><span class="zhuyin-text">ㄝ</span>認<span class="zhuyin-text">ㄖ</span><span class="zhuyin-text">ㄣ</span>提<span class="zhuyin-text">ㄊ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄠ</span>交<span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄠ</span></span>
+        <span v-else>確認提交</span>
+      </button>
+    </div>
+
+    <!-- 顯示輸入的資料 -->
+    <div class="info-display" v-if="submittedInfo.length > 0">
+      <h3>
+        <span v-if="showZhuyin">監<span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span>考<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄕ</span>資<span class="zhuyin-text">ㄗ</span><span class="zhuyin-text">ㄒ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄣ</span></span>
+        <span v-else>監考資訊</span>
+      </h3>
+      <div v-for="(info, index) in submittedInfo" :key="index" class="info-item">
+        <div>
+          <span class="info-label">
+            <span v-if="showZhuyin">科<span class="zhuyin-text">ㄎ</span><span class="zhuyin-text">ㄇ</span><span class="zhuyin-text">ㄨ</span></span>
+            <span v-else>科目</span>：
+          </span>{{ info.subject }}
+        </div>
+        <div>
+          <span class="info-label">
+            <span v-if="showZhuyin">時<span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄐ</span><span class="zhuyin-text">ㄧ</span><span class="zhuyin-text">ㄢ</span></span>
+            <span v-else>時間</span>：
+          </span>{{ info.examTime }}
+        </div>
+        <div>
+          <span class="info-label">
+            <span v-if="showZhuyin">老<span class="zhuyin-text">ㄌ</span><span class="zhuyin-text">ㄠ</span><span class="zhuyin-text">ㄕ</span><span class="zhuyin-text">ㄕ</span></span>
+            <span v-else>老師</span>：
+          </span>{{ info.teacher }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted, onUnmounted } = Vue;
+
+    createApp({
+      setup() {
+        const isDarkMode = ref(false);
+        const showZhuyin = ref(false);
+        const showCountdown = ref(false);
+        const currentTime = ref('');
+        const countdownTime = ref(0);
+        const examTime = ref('');
+        const subject = ref('');
+        const teacher = ref('');
+        const submittedInfo = ref([]);
+        let timeInterval = null;
+        let countdownInterval = null;
+
+        const updateTime = () => {
+          const now = new Date();
+          currentTime.value = now.toLocaleString('zh-TW', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          });
+        };
+
+        const startCountdown = () => {
+          // 預設5分鐘倒數
+          countdownTime.value = 300;
+          countdownInterval = setInterval(() => {
+            if (countdownTime.value > 0) {
+              countdownTime.value--;
+            } else {
+              clearInterval(countdownInterval);
+            }
+          }, 1000);
+        };
+
+        const formatCountdown = (seconds) => {
+          const mins = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        const toggleTheme = () => {
+          isDarkMode.value = !isDarkMode.value;
+        };
+
+        const toggleZhuyin = () => {
+          showZhuyin.value = !showZhuyin.value;
+        };
+
+        const toggleCountdown = () => {
+          showCountdown.value = !showCountdown.value;
+          if (showCountdown.value) {
+            startCountdown();
+          } else {
+            if (countdownInterval) {
+              clearInterval(countdownInterval);
+            }
+          }
+        };
+
+        const submitInfo = () => {
+          if (examTime.value || subject.value || teacher.value) {
+            submittedInfo.value.push({
+              examTime: examTime.value || '-',
+              subject: subject.value || '-',
+              teacher: teacher.value || '-'
+            });
+            // 清空輸入
+            examTime.value = '';
+            subject.value = '';
+            teacher.value = '';
+          }
+        };
+
+        onMounted(() => {
+          updateTime();
+          timeInterval = setInterval(updateTime, 1000);
+        });
+
+        onUnmounted(() => {
+          if (timeInterval) clearInterval(timeInterval);
+          if (countdownInterval) clearInterval(countdownInterval);
+        });
+
+        return {
+          isDarkMode,
+          showZhuyin,
+          showCountdown,
+          currentTime,
+          countdownTime,
+          examTime,
+          subject,
+          teacher,
+          submittedInfo,
+          toggleTheme,
+          toggleZhuyin,
+          toggleCountdown,
+          submitInfo,
+          formatCountdown
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
+
